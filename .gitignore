@@ -1,0 +1,22 @@
+# Segredos - NUNCA enviar ao GitHub
+.env
+*.env
+
+# Dados de usuários e resultados locais
+quiz_results.json
+quiz_config.json
+categorias_cache.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Excel/arquivos locais
+*.xlsx
+*.xls
+*.gdoc
+
+# Sistema
+.DS_Store
+Thumbs.db
