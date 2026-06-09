@@ -151,6 +151,50 @@ tbody tr:hover td{background:var(--bg3);}
 .gen-section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;}
 .gen-section h4{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
 
+/* TIMER */
+#q-timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+#q-timer{font-size:22px;font-weight:900;color:var(--gold);min-width:36px;text-align:center;transition:color .3s;}
+#q-timer.urgent{color:var(--danger);animation:pulse .5s infinite;}
+#q-timer-bar-track{flex:1;background:var(--bg3);border-radius:999px;height:8px;overflow:hidden;}
+#q-timer-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--success),var(--gold));transition:width .9s linear,background .3s;}
+#q-timer-bar.urgent{background:linear-gradient(90deg,#f97316,var(--danger));}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* STREAK */
+#q-streak-badge{font-size:12px;font-weight:700;color:#fff;background:#f97316;border-radius:999px;padding:2px 10px;display:none;}
+
+/* MEDALS */
+.medals-wrap{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:16px 0;}
+.medal-item{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;min-width:80px;}
+.medal-icon{font-size:28px;}
+.medal-name{font-size:11px;font-weight:700;color:var(--text);}
+.medal-desc{font-size:10px;color:var(--text-muted);text-align:center;}
+
+/* SPEED BONUS */
+.speed-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--border);font-size:13px;}
+
+/* RANKING */
+.ranking-section{margin-top:24px;padding-top:20px;border-top:2px solid var(--border);}
+.ranking-pos{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--gold-light),#fff8e1);border:1px solid var(--gold-mid);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-weight:700;}
+.ranking-pos .pos-num{font-size:28px;font-weight:900;color:var(--gold);}
+.ranking-table-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.ranking-row{display:grid;grid-template-columns:36px 1fr auto auto;gap:8px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;}
+.ranking-row:last-child{border-bottom:none;}
+.ranking-row:nth-child(1){background:#fffbeb;}
+.ranking-row:nth-child(2){background:#f9fafb;}
+.ranking-row:nth-child(3){background:#f9fafb;}
+.ranking-row-head{background:var(--bg3)!important;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;}
+.rank-pos-badge{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;background:var(--bg3);color:var(--text-muted);}
+.rank-pos-badge.top1{background:#fbbf24;color:#fff;}
+.rank-pos-badge.top2{background:#9ca3af;color:#fff;}
+.rank-pos-badge.top3{background:#cd7c3a;color:#fff;}
+.rank-me{background:#eff6ff!important;border-left:3px solid var(--gold);}
+
+/* CONFETES */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;}
+.confetti-piece{position:absolute;width:10px;height:10px;top:-10px;opacity:0;animation:confettiFall linear forwards;}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:.2;transform:translateY(100vh) rotate(720deg);}}
+
 @media(max-width:600px){
   .modal-opts-grid{grid-template-columns:1fr;}
   .card{padding:24px 20px;}
@@ -226,9 +270,17 @@ tbody tr:hover td{background:var(--bg3);}
     </div>
     <div class="progress-meta">
       <span id="q-label" style="font-weight:600;font-size:13px;"></span>
-      <span id="q-pct" style="color:var(--gold);font-weight:700;font-size:13px;"></span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="q-streak-badge">🔥 <span id="q-streak-num">0</span>x streak</span>
+        <span id="q-pct" style="color:var(--gold);font-weight:700;font-size:13px;"></span>
+      </div>
     </div>
     <div class="progress-track mb-24"><div class="progress-fill" id="q-prog"></div></div>
+    <div id="q-timer-wrap">
+      <span>⏱️</span>
+      <div id="q-timer-bar-track"><div id="q-timer-bar" style="width:100%;"></div></div>
+      <span id="q-timer">30</span>
+    </div>
     <div id="q-text" style="font-size:17px;font-weight:600;line-height:1.55;margin-bottom:20px;"></div>
     <div class="option-list" id="q-opts"></div>
     <div id="err-quiz" class="alert alert-warn mt-12" style="display:none;">Selecione uma alternativa para continuar.</div>
@@ -253,6 +305,26 @@ tbody tr:hover td{background:var(--bg3);}
       <div id="res-concept" class="concept-pill" style="width:64px;height:64px;font-size:28px;margin:0 auto;"></div>
     </div>
     <div id="res-msg" class="alert mt-16"></div>
+    <!-- GAMIFICATION: medals & speed -->
+    <div id="res-gamification" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <div id="res-medals-wrap" style="display:none;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;text-align:center;margin-bottom:8px;">🏅 Medalhas Conquistadas</div>
+        <div id="res-medals" class="medals-wrap"></div>
+      </div>
+      <div id="res-speed-wrap" style="margin-top:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">⚡ Desempenho por Velocidade</div>
+        <div id="res-speed-rows"></div>
+      </div>
+    </div>
+
+    <!-- RANKING -->
+    <div id="res-ranking" class="ranking-section" style="display:none;">
+      <h3 style="font-size:15px;font-weight:800;margin-bottom:12px;">🏆 Ranking da Empresa</h3>
+      <div id="res-ranking-pos" class="ranking-pos" style="display:none;"></div>
+      <div id="res-ranking-msg" style="font-size:13px;color:var(--text-muted);margin-bottom:12px;"></div>
+      <div id="res-ranking-table"></div>
+    </div>
+
     <div class="gap-12 mt-20" style="justify-content:center;">
       <button class="btn btn-secondary" onclick="downloadPDF()">📄 Baixar PDF</button>
       <button class="btn btn-primary" onclick="goto('home')">🏠 Início</button>
@@ -586,6 +658,16 @@ tbody tr:hover td{background:var(--bg3);}
         <div id="msg-whatsapp" class="alert alert-ok mt-8" style="display:none;">✅ WhatsApp salvo!</div>
 
         <div class="divider"></div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;">📊 Ranking Google Sheets</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">URL do Google Apps Script para registrar resultados e exibir ranking em tempo real. Opcional — o quiz funciona normalmente sem esta configuração.</p>
+        <div class="form-group">
+          <label>URL do Google Apps Script (Ranking)</label>
+          <input type="text" id="cfg-sheets-url" placeholder="https://script.google.com/macros/s/.../exec" />
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveSheetsUrl()">Salvar URL</button>
+        <div id="msg-sheets-url" class="alert alert-ok mt-8" style="display:none;">✅ URL salva!</div>
+
+        <div class="divider"></div>
         <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;">Resumo da Configuração</h3>
         <div id="cfg-preview" style="font-size:13px;color:var(--text-muted);line-height:1.8;"></div>
       </div>
@@ -666,7 +748,37 @@ function defaultPost() {
 }
 
 // ===================== STATE =====================
-const S = { user:null, quizType:null, questions:[], curQ:0, answers:{}, lastResult:null, edTab:'warmup' };
+const S = { user:null, quizType:null, questions:[], curQ:0, answers:{}, lastResult:null, edTab:'warmup',
+  questionStartTime:0, responseTimes:[], streak:0, maxStreak:0, speedPoints:0, _timerInterval:null };
+
+// ===================== TIMER =====================
+function clearQTimer(){if(S._timerInterval){clearInterval(S._timerInterval);S._timerInterval=null;}}
+function startQTimer(){
+  clearQTimer();
+  const TOTAL=30;
+  let remaining=TOTAL;
+  const tEl=$('q-timer'), bEl=$('q-timer-bar');
+  if(tEl)tEl.textContent=remaining;
+  if(bEl){bEl.style.width='100%';bEl.className='';bEl.style.transition='none';}
+  S.questionStartTime=Date.now();
+  setTimeout(()=>{if(bEl){bEl.style.transition='width 0.9s linear';}},50);
+  S._timerInterval=setInterval(()=>{
+    remaining--;
+    const pct=Math.round(remaining/TOTAL*100);
+    if(tEl){tEl.textContent=remaining;tEl.className=remaining<=10?'urgent':'';}
+    if(bEl){bEl.style.width=pct+'%';bEl.className=remaining<=10?'urgent':'';}
+    if(remaining<=0){clearQTimer();autoNextQ();}
+  },1000);
+}
+function autoNextQ(){
+  const q=S.questions[S.curQ];
+  if(!S.answers[q.id]){
+    S.responseTimes[S.curQ]=30001; // marks timeout
+    S.streak=0;
+    if(S.curQ<S.questions.length-1){S.curQ++;renderQ();}
+    else finishQuiz();
+  }
+}
 
 // ===================== ROUTING =====================
 function goto(screen) {
@@ -703,7 +815,7 @@ function startQuizWithType(type) {
   if(!bank.length){alert('Este quiz não possui questões. Aguarde configuração pelo administrador.');goto('home');return;}
   const shuffled=[...bank].sort(()=>Math.random()-.5);
   S.questions=shuffled.slice(0,Math.min(count,shuffled.length));
-  S.curQ=0; S.answers={};
+  S.curQ=0; S.answers={}; S.responseTimes=[]; S.streak=0; S.maxStreak=0; S.speedPoints=0;
   const badge=$('quiz-type-badge');
   if(type==='warmup'){badge.textContent='🌡️ Warm-up';badge.style.background='#ede9fe';badge.style.color='#5b21b6';}
   else{badge.textContent='🏆 Pós-treinamento';badge.style.background='#ccfbf1';badge.style.color='#065f46';}
@@ -726,41 +838,122 @@ function renderQ() {
   const last=S.curQ===total-1;
   $('btn-next').textContent=last?'✓ Finalizar':'Próxima →';
   $('btn-next').className='btn '+(last?'btn-success':'btn-primary');
+  // streak badge
+  const sb=$('q-streak-badge'), sn=$('q-streak-num');
+  if(sb&&sn){sn.textContent=S.streak;sb.style.display=S.streak>=2?'inline-flex':'none';}
+  // start timer (only for fresh question — no answer yet)
+  if(!sel) startQTimer(); else clearQTimer();
 }
 function pickOpt(qid,letter,el){
+  // Record response time only if first answer for this question
+  if(!S.answers[qid]){
+    const elapsed=Date.now()-S.questionStartTime;
+    S.responseTimes[S.curQ]=elapsed;
+    clearQTimer();
+  }
   S.answers[qid]=letter;
   document.querySelectorAll('.option-btn').forEach(b=>{b.classList.remove('selected');b.querySelector('.option-letter').style.cssText='';});
   el.classList.add('selected');
   el.querySelector('.option-letter').style.cssText='background:var(--gold);color:#fff;border-color:var(--gold);';
   $('err-quiz').style.display='none';
 }
-function prevQ(){if(S.curQ>0){S.curQ--;renderQ();}}
+function prevQ(){if(S.curQ>0){clearQTimer();S.curQ--;renderQ();}}
 function nextQ(){
   const q=S.questions[S.curQ];
   if(!S.answers[q.id]){$('err-quiz').style.display='block';return;}
+  // update streak
+  if(S.answers[q.id]===q.correct){S.streak++;if(S.streak>S.maxStreak)S.maxStreak=S.streak;}
+  else S.streak=0;
+  clearQTimer();
   if(S.curQ<S.questions.length-1){S.curQ++;renderQ();}
   else finishQuiz();
 }
 
 // ===================== FINISH =====================
+function calcSpeedBonus(elapsedMs, pts){
+  if(elapsedMs>30000)return 0; // timeout
+  const s=Math.floor(elapsedMs/1000);
+  if(s<=10)return pts;
+  if(s<=20)return Math.round(pts*0.7);
+  return Math.round(pts*0.4);
+}
+
 function finishQuiz() {
+  clearQTimer();
   const d=load(), g=d.config.grade;
-  let earned=0, total=0, hits=0;
-  S.questions.forEach(q=>{total+=q.pts;if(S.answers[q.id]===q.correct){earned+=q.pts;hits++;}});
+  let earned=0, total=0, hits=0, speedPoints=0;
+  const timings=[];
+  S.questions.forEach((q,i)=>{
+    total+=q.pts;
+    const elapsed=S.responseTimes[i]||31000;
+    timings.push(Math.min(elapsed,31000));
+    if(S.answers[q.id]===q.correct){
+      earned+=q.pts; hits++;
+      speedPoints+=calcSpeedBonus(elapsed,q.pts);
+    }
+  });
   const pct=total>0?Math.round(earned/total*100):0;
   const concept=pct>=g.A?'A':pct>=g.B?'B':pct>=g.C?'C':'D';
-  const r={id:Date.now().toString(),name:S.user.name,company:S.user.company,email:S.user.email,quizType:S.quizType,score:earned,total,hits,totalQ:S.questions.length,pct,concept,date:new Date().toLocaleString('pt-BR'),answers:{...S.answers}};
+  const avgTime=timings.length?Math.round(timings.reduce((a,b)=>a+b,0)/timings.length/1000):30;
+
+  // Determine medals
+  const medals=[];
+  if(pct===100)medals.push({icon:'🥇',name:'Expert',desc:'100% de acertos'});
+  if(hits===S.questions.length&&hits>0)medals.push({icon:'🔥',name:'Foco Total',desc:'Nenhum erro!'});
+  if(avgTime<10&&hits>0)medals.push({icon:'⚡',name:'Velocista',desc:'Tempo médio < 10s'});
+  if(S.maxStreak>=3)medals.push({icon:'🎯',name:`Streak x${S.maxStreak}`,desc:`${S.maxStreak} acertos seguidos`});
+  medals.push({icon:'📈',name:'Evolução',desc:'Resultado registrado'});
+
+  const r={id:Date.now().toString(),name:S.user.name,company:S.user.company,email:S.user.email,quizType:S.quizType,score:earned,total,hits,totalQ:S.questions.length,pct,concept,date:new Date().toLocaleString('pt-BR'),answers:{...S.answers},timings,avgTime,maxStreak:S.maxStreak,speedPoints,medals:medals.map(m=>m.name)};
   d.results.push(r); save(d); S.lastResult=r;
   renderResult(r); goto('results');
+  launchConfetti(pct);
+  postToSheets(r,d.config.sheetsUrl||'');
 }
 
 function renderResult(r) {
   const typeLabel=r.quizType==='warmup'?'🌡️ Warm-up':'🏆 Pós-treinamento';
-  $('res-rows').innerHTML=[['👤 Participante',r.name],['🏢 Empresa',r.company],['📋 Tipo',typeLabel],['✅ Acertos',`${r.hits} de ${r.totalQ} questões`],['📊 Score',`${r.pct}%`]].map(([l,v])=>`<div class="result-row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`).join('');
+  const avgTimeStr=r.avgTime!=null?`${r.avgTime}s`:'—';
+  const speedPts=r.speedPoints!=null?r.speedPoints:'—';
+  $('res-rows').innerHTML=[['👤 Participante',r.name],['🏢 Empresa',r.company],['📋 Tipo',typeLabel],['✅ Acertos',`${r.hits} de ${r.totalQ} questões`],['📊 Score',`${r.pct}%`],['⏱️ Tempo médio',avgTimeStr],['🔥 Maior Streak',r.maxStreak||0],['⚡ Bônus Velocidade',speedPts+' pts']].map(([l,v])=>`<div class="result-row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`).join('');
   const pill=$('res-concept'); pill.textContent=r.concept; pill.className='concept-pill c'+r.concept;
   const msgs={A:['alert-ok','🌟 Excelente! Você dominou o conteúdo com maestria.'],B:['alert-ok','👏 Muito bom! Você demonstrou ótimo conhecimento.'],C:['alert-warn','💪 Bom trabalho! Continue estudando para aprimorar.'],D:['alert-warn','📚 Não desanime! Revise o material — você vai evoluir.']};
   const [cls,txt]=msgs[r.concept]; const el=$('res-msg'); el.className='alert '+cls; el.textContent=txt;
   updateWALink();
+
+  // Medals
+  const gEl=$('res-gamification');
+  if(gEl) gEl.style.display='block';
+  if(r.medals&&r.medals.length){
+    const mWrap=$('res-medals-wrap'), mEl=$('res-medals');
+    const medalDefs={
+      'Expert':{icon:'🥇',desc:'100% de acertos'},
+      'Foco Total':{icon:'🔥',desc:'Nenhum erro!'},
+      'Velocista':{icon:'⚡',desc:'Tempo médio < 10s'},
+      'Evolução':{icon:'📈',desc:'Resultado registrado'}
+    };
+    const medalHtml=r.medals.map(name=>{
+      const streak=name.match(/^Streak x(\d+)$/);
+      if(streak)return `<div class="medal-item"><span class="medal-icon">🎯</span><span class="medal-name">${name}</span><span class="medal-desc">${streak[1]} acertos seguidos</span></div>`;
+      const def=medalDefs[name]||{icon:'🏅',desc:''};
+      return `<div class="medal-item"><span class="medal-icon">${def.icon}</span><span class="medal-name">${name}</span><span class="medal-desc">${def.desc}</span></div>`;
+    }).join('');
+    if(mEl) mEl.innerHTML=medalHtml;
+    if(mWrap) mWrap.style.display='block';
+  }
+
+  // Speed rows
+  const speedEl=$('res-speed-rows');
+  if(speedEl&&r.timings){
+    speedEl.innerHTML=r.timings.map((ms,i)=>{
+      const q=S.questions[i];
+      const s=ms>30000?'—':Math.floor(ms/1000)+'s';
+      const correct=r.answers&&q?r.answers[q.id]===q.correct:false;
+      const bp=r.timings[i]>30000?0:calcSpeedBonus(r.timings[i],(q&&q.pts)||10);
+      return `<div class="speed-row"><span>Q${i+1} ${correct?'✅':'❌'}</span><span style="color:var(--text-muted);">${s}</span><span style="color:var(--gold);font-weight:700;">${correct?'+'+bp+' pts':'0 pts'}</span></div>`;
+    }).join('');
+  }
+
   // Show review for post-training
   if(r.quizType==='post') renderReview();
   else $('review-section').style.display='none';
@@ -796,6 +989,84 @@ function downloadPDF() {
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Resultado — ${r.name}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#fff;color:#111}.page{max-width:680px;margin:0 auto;padding:48px 40px}.hdr{text-align:center;padding-bottom:28px;margin-bottom:32px;border-bottom:4px solid #d97706}.etl{display:inline-block;background:#d97706;color:#fff;font-size:10px;font-weight:800;letter-spacing:2px;padding:4px 14px;border-radius:999px;text-transform:uppercase;margin-bottom:12px}.h1{font-size:30px;font-weight:900}.h2{font-size:14px;color:#6b7280;margin-top:6px}.sec{margin-bottom:28px}.stitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f3f4f6}.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f9fafb;font-size:14px}.row .l{color:#6b7280}.row .v{font-weight:600}.cbox{text-align:center;background:${cb[r.concept]};border:2px solid ${cc[r.concept]};border-radius:14px;padding:28px;margin:28px 0}.cletter{font-size:72px;font-weight:900;color:${cc[r.concept]};line-height:1}.bwrap{background:#f3f4f6;border-radius:999px;height:12px;overflow:hidden;margin:8px 0 4px}.bfill{background:${cc[r.concept]};height:100%;border-radius:999px;width:${r.pct}%}.foot{margin-top:48px;padding-top:20px;border-top:1px solid #e5e7eb;text-align:center;font-size:11px;color:#9ca3af}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style></head><body><div class="page"><div class="hdr"><div class="etl">Escape Time Learning</div><div class="h1">Relatório de Avaliação</div><div class="h2">${d.config.title||'Treinamento Corporativo'}</div></div><div class="sec"><div class="stitle">Dados do Participante</div><div class="row"><span class="l">Nome</span><span class="v">${r.name}</span></div><div class="row"><span class="l">Empresa</span><span class="v">${r.company}</span></div><div class="row"><span class="l">E-mail / Matrícula</span><span class="v">${r.email}</span></div><div class="row"><span class="l">Tipo de Avaliação</span><span class="v">${typeLabel}</span></div><div class="row"><span class="l">Data e Hora</span><span class="v">${r.date}</span></div></div><div class="sec"><div class="stitle">Desempenho</div><div class="row"><span class="l">Acertos</span><span class="v">${r.hits} de ${r.totalQ}</span></div><div class="row"><span class="l">Pontuação</span><span class="v">${r.score} de ${r.total} pontos</span></div><div class="row"><span class="l">Percentual</span><span class="v" style="color:${cc[r.concept]};">${r.pct}%</span></div><div class="bwrap"><div class="bfill"></div></div></div><div class="cbox"><div style="font-size:11px;font-weight:700;letter-spacing:1px;color:${cc[r.concept]};text-transform:uppercase;margin-bottom:8px;">Conceito Obtido</div><div class="cletter">${r.concept}</div><div style="font-size:15px;color:#374151;margin-top:12px;">${msgs[r.concept]}</div></div><div class="foot"><strong>Escape Time Learning</strong> — www.escapetime.com.br<br>Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script></body></html>`);
   w.document.close();
+}
+
+// ===================== CONFETTI =====================
+function launchConfetti(pct){
+  if(pct<40)return;
+  let container=document.getElementById('confetti-container');
+  if(!container){container=document.createElement('div');container.id='confetti-container';container.className='confetti-container';document.body.appendChild(container);}
+  container.innerHTML='';
+  const colors=['#d97706','#f59e0b','#fbbf24','#059669','#3b82f6','#8b5cf6','#ec4899','#ef4444'];
+  const count=pct>=90?80:pct>=75?50:30;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    const size=(Math.random()*8+6)+'px';
+    const left=(Math.random()*100)+'%';
+    const delay=(Math.random()*2)+'s';
+    const dur=(Math.random()*2+2)+'s';
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    const shape=Math.random()>.5?'50%':'2px';
+    p.style.cssText=`width:${size};height:${size};left:${left};background:${color};border-radius:${shape};animation-delay:${delay};animation-duration:${dur};`;
+    container.appendChild(p);
+  }
+  setTimeout(()=>{if(container)container.innerHTML='';},5000);
+}
+
+// ===================== GOOGLE SHEETS RANKING =====================
+async function postToSheets(r, url){
+  if(!url)return;
+  try{
+    const payload={action:'submit',name:r.name,company:r.company,email:r.email,quizType:r.quizType,pct:r.pct,hits:r.hits,totalQ:r.totalQ,avgTime:r.avgTime||0,speedPoints:r.speedPoints||0,maxStreak:r.maxStreak||0,medals:(r.medals||[]).join(','),date:r.date};
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    // After submit, fetch ranking
+    setTimeout(()=>fetchRanking(r.company,r.email,url),1500);
+  }catch(e){/* silent fail */}
+}
+async function fetchRanking(company,email,url){
+  if(!url)return;
+  try{
+    const res=await fetch(`${url}?action=ranking&company=${encodeURIComponent(company)}`);
+    if(!res.ok)return;
+    const data=await res.json();
+    if(data&&data.ranking)renderRanking(data.ranking,email,company);
+  }catch(e){/* silent fail */}
+}
+function renderRanking(ranking,myEmail,company){
+  const el=$('res-ranking'); if(!el)return;
+  el.style.display='block';
+  const myIdx=ranking.findIndex(row=>row.email&&row.email.toLowerCase()===myEmail.toLowerCase());
+  const myPos=myIdx>=0?myIdx+1:-1;
+  // Position badge
+  const posEl=$('res-ranking-pos');
+  if(posEl&&myPos>0){posEl.style.display='flex';posEl.innerHTML=`<span class="pos-num">${myPos}º</span><span>Você está em <strong>${myPos}º lugar</strong> na ${company}!</span>`;}
+  // Motivational message
+  const msgEl=$('res-ranking-msg');
+  if(msgEl){
+    if(myPos>3&&myPos>0){
+      const top3entry=ranking[2];
+      if(top3entry){const diff=top3entry.pct-(ranking[myIdx]||{}).pct||0;msgEl.textContent=diff>0?`Só mais ${diff}% para entrar no Top 3!`:'Continue assim para subir no ranking!';}
+    } else if(myPos>0&&myPos<=3){msgEl.textContent='Parabéns! Você está no Top 3 da sua empresa!';}
+  }
+  // Table
+  const tableEl=$('res-ranking-table');
+  if(tableEl){
+    const top=ranking.slice(0,10);
+    const rows=top.map((row,i)=>{
+      const pos=i+1;
+      const isMe=row.email&&row.email.toLowerCase()===myEmail.toLowerCase();
+      const badgeCls=pos===1?'top1':pos===2?'top2':pos===3?'top3':'';
+      const podium=pos<=3?['🥇','🥈','🥉'][pos-1]:'';
+      return `<div class="ranking-row${isMe?' rank-me':''}">
+        <div class="rank-pos-badge ${badgeCls}">${podium||pos}</div>
+        <div style="font-weight:${isMe?700:400};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.name||'—'}${isMe?' (você)':''}</div>
+        <div style="color:var(--gold);font-weight:700;">${row.pct}%</div>
+        <div style="color:var(--text-muted);font-size:11px;">${row.avgTime||'—'}s</div>
+      </div>`;
+    }).join('');
+    tableEl.innerHTML=`<div class="ranking-table-wrap"><div class="ranking-row ranking-row-head"><div>#</div><div>Nome</div><div>Score</div><div>T.médio</div></div>${rows}</div>`;
+  }
 }
 
 // ===================== WHATSAPP =====================
@@ -1099,10 +1370,12 @@ function loadCfgTab(){
   $('cfg-qa-post').value=d.config.qaPerPost||5;
   $('cfg-whatsapp').value=d.config.whatsapp||'5511958269988';
   $('cfg-content').value=d.config.trainingContent||'';
+  $('cfg-sheets-url').value=d.config.sheetsUrl||'';
   $('bank-warmup-count').textContent=(d.warmup||[]).length;
   $('bank-post-count').textContent=(d.post||[]).length;
   updateCfgPreview(d);
 }
+function saveSheetsUrl(){const d=load();d.config.sheetsUrl=$('cfg-sheets-url').value.trim();save(d);flashMsg('msg-sheets-url');}
 function saveCfgTitle(){const d=load();d.config.title=$('cfg-title').value.trim()||'Treinamento Escape Time Learning';save(d);flashMsg('msg-title');updateCfgPreview(d);}
 function saveCfgContent(){const d=load();d.config.trainingContent=$('cfg-content').value;save(d);flashMsg('msg-content');}
 function clearContent(){if(confirm('Limpar todo o conteúdo?')){$('cfg-content').value='';const d=load();d.config.trainingContent='';save(d);}}
