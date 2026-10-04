@@ -28,6 +28,13 @@ fi
 if compgen -G "$ORIGEM/videos/*.*" > /dev/null; then
     cp -v "$ORIGEM"/videos/*.* "$PASTA_VIDEOS/"
 fi
+# confere se os 3 vídeos esperados estão lá
+for n in 1 2 3; do
+    if [ ! -f "$PASTA_VIDEOS/video$n.mp4" ]; then
+        echo "AVISO: não encontrei $PASTA_VIDEOS/video$n.mp4"
+        echo "       (confira o nome: tudo minúsculo, sem espaço, e não 'video$n.mp4.mp4')"
+    fi
+done
 
 echo "==> 3/6 Dando permissão de vídeo, som e GPIO ao usuário $USUARIO ..."
 sudo usermod -aG video,render,audio,gpio "$USUARIO"
@@ -65,6 +72,12 @@ grep -q '^disable_splash=1' "$CONFIGTXT" || echo 'disable_splash=1' | sudo tee -
 
 echo "==> 6/6 Volume da saída P2 no máximo..."
 amixer -c Headphones sset PCM 100% > /dev/null 2>&1 || true
+
+# se a pasta foi copiada para o cartão pelo Windows (partição de boot),
+# apaga de lá no final, para liberar espaço
+case "$ORIGEM" in
+    /boot/*) echo "Removendo cópia temporária em $ORIGEM ..."; sudo rm -rf "$ORIGEM" ;;
+esac
 
 echo
 echo "Instalação concluída."

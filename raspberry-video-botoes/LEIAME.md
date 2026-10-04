@@ -16,7 +16,8 @@ Arquivos:
 | `config.ini` | Pinos dos botões, nomes dos vídeos e saída de som |
 | `encontrar_pinos.py` | Descobre em quais pinos os botões estão ligados |
 | `instalar.sh` | Instala tudo e configura para iniciar sozinho |
-| `videos/` | Coloque aqui os 3 vídeos antes de copiar para o pendrive |
+| `videos/` | Coloque aqui os 3 vídeos (`video1.mp4`, `video2.mp4`, `video3.mp4`) |
+| `docs/diagrama-ligacao.png` | Desenho de onde ligar os botões |
 
 ---
 
@@ -34,35 +35,72 @@ Arquivos:
    - Na aba **Serviços**, ative o **SSH** (opcional, para mexer pelo computador)
 4. Grave e espere terminar.
 
-## Passo 2 — Preparar um pendrive com os arquivos
+## Passo 2 — Colocar o programa e os vídeos no cartão (pelo computador)
 
-1. Copie a pasta `raspberry-video-botoes` inteira para um pendrive.
-2. Coloque os 3 vídeos dentro de `raspberry-video-botoes/videos/` com os nomes
-   `video1.mp4`, `video2.mp4` e `video3.mp4`.
-   Se quiser outros nomes, altere em `config.ini`.
+Não é só copiar o sistema: ele **tem que ser gravado pelo Imager** (Passo 1).
+Mas, depois disso, o programa e os vídeos **são só copiar e colar**:
+
+1. Depois que o Imager terminar, **tire o cartão e coloque de novo** no computador.
+2. Vai aparecer um disco chamado **`bootfs`**. Abra ele.
+   - ⚠️ O Windows pode avisar *"É preciso formatar o disco antes de usá-lo"*.
+     Esse aviso é sobre a outra parte do cartão, que é do Linux. **Clique em CANCELAR.**
+     Nunca formate.
+3. Coloque os 3 vídeos dentro da pasta `raspberry-video-botoes\videos` com estes nomes:
+
+   | Botão | Nome do arquivo |
+   |---|---|
+   | Botão 1 | `video1.mp4` |
+   | Botão 2 | `video2.mp4` |
+   | Botão 3 | `video3.mp4` |
+
+   - Os nomes devem ser **minúsculos, sem espaço e sem acento**.
+   - O Windows costuma esconder o ".mp4". Se você renomear para `video1.mp4`
+     com a extensão escondida, o arquivo vira `video1.mp4.mp4` e não funciona.
+     Para ver a extensão, no Explorador vá em **Exibir → Mostrar → Extensões de nomes de arquivos**.
+4. Copie a pasta **`raspberry-video-botoes`** inteira, já com os vídeos, para dentro do disco `bootfs`.
+5. Clique com o botão direito no disco e escolha **Ejetar**. Depois tire o cartão.
+
+**Espaço:** o `bootfs` costuma ter uns 300 MB livres (o Windows mostra o espaço livre do disco). Se os vídeos juntos passarem
+disso, o Windows vai avisar que não há espaço. Nesse caso, copie a pasta para
+um **pendrive** e veja a observação no fim do Passo 3.
 
 **Formato recomendado dos vídeos:** MP4 com vídeo **H.264**, até **1920x1080 a 30 fps**.
 A Pi 3 não consegue tocar H.265/HEVC nem 4K de forma fluida. Se um vídeo travar,
 converta no **HandBrake** (preset *Fast 1080p30*) ou reduza para 720p.
 
-## Passo 3 — Instalar na Raspberry
+## Passo 3 — Instalar na Raspberry (só uma vez)
 
-1. Coloque o cartão na Raspberry, ligue um teclado, a TV/monitor e a energia.
-2. Espere aparecer `login:`. Entre com o usuário e a senha que você criou.
-3. Coloque o pendrive e digite (um comando por linha, Enter depois de cada):
+1. Coloque o cartão na Raspberry. Ligue um **teclado USB**, a TV/monitor e,
+   **por último**, a energia.
+2. A Raspberry precisa de **internet** nessa etapa: use o Wi-Fi configurado no
+   Imager ou um cabo de rede.
+3. Espere aparecer `login:`. Digite o usuário (`pi`), Enter, e depois a senha, Enter.
+   A senha não aparece enquanto você digita; isso é normal.
+4. Digite exatamente isto e aperte Enter:
 
    ```
-   sudo mkdir -p /mnt/pendrive
-   sudo mount /dev/sda1 /mnt/pendrive
-   cp -r /mnt/pendrive/raspberry-video-botoes ~/
-   sudo umount /mnt/pendrive
-   bash ~/raspberry-video-botoes/instalar.sh
+   bash /boot/firmware/raspberry-video-botoes/instalar.sh
    ```
 
-   A Raspberry precisa de internet nessa etapa, porque o instalador baixa o mpv.
-4. Quando terminar, digite `sudo reboot`. A partir daí ela liga direto na tela preta.
+5. Espere terminar (de 5 a 15 minutos). Ele instala tudo, passa os vídeos para
+   `/home/pi/videos` e apaga a cópia temporária do `bootfs`.
+6. Digite `sudo reboot`. A partir daí ela liga direto na tela preta.
+
+> **Se os vídeos foram para um pendrive** (porque não couberam no cartão),
+> coloque o pendrive na Pi e, no item 4, digite estes comandos no lugar:
+>
+> ```
+> sudo mkdir -p /mnt/pendrive
+> sudo mount /dev/sda1 /mnt/pendrive
+> cp -r /mnt/pendrive/raspberry-video-botoes ~/
+> sudo umount /mnt/pendrive
+> bash ~/raspberry-video-botoes/instalar.sh
+> ```
 
 ## Passo 4 — Ligar os botões
+
+Veja o desenho em **`docs/diagrama-ligacao.png`**.
+
 
 Cada botão tem 2 fios: um vai no seu pino de sinal e o outro vai no GND.
 Os 3 botões podem dividir **um único fio de GND**, emendado nos três.
