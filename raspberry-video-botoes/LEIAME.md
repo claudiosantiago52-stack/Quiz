@@ -62,9 +62,37 @@ converta no **HandBrake** (preset *Fast 1080p30*) ou reduza para 720p.
    A Raspberry precisa de internet nessa etapa, porque o instalador baixa o mpv.
 4. Quando terminar, digite `sudo reboot`. A partir daí ela liga direto na tela preta.
 
-## Passo 4 — Descobrir os pinos dos botões
+## Passo 4 — Ligar os botões
 
-Os pinos padrão são estes:
+Cada botão tem 2 fios: um vai no seu pino de sinal e o outro vai no GND.
+Os 3 botões podem dividir **um único fio de GND**, emendado nos três.
+Não precisa de resistor, porque a Raspberry usa o resistor interno dela.
+
+**Ligue com a Raspberry desligada da tomada.**
+
+Segure a placa com as **portas USB para baixo**. A fileira de pinos fica na
+**borda direita**. Conte os pinos de cima para baixo na **coluna de dentro**,
+a que fica mais perto do centro da placa:
+
+```
+          coluna de DENTRO   coluna de FORA (borda)
+  1º         pino 1              pino 2
+  2º         pino 3              pino 4
+  3º         pino 5              pino 6
+  4º         pino 7              pino 8
+  5º         pino 9  ← GND (fio comum dos 3 botões)
+  6º         pino 11 ← BOTÃO 1
+  7º         pino 13 ← BOTÃO 2
+  8º         pino 15 ← BOTÃO 3
+```
+
+Se o botão tiver **4 perninhas** (botão pequeno quadrado), use duas perninhas
+em **diagonal**, para garantir que são lados opostos do contato.
+
+**Cuidado:** não ligue nada nos pinos 1, 2, 4 e 17. São alimentação de 3.3V e 5V
+e podem queimar a placa se encostarem no GND.
+
+Os pinos usados no programa são estes:
 
 | Botão | GPIO | Pino físico |
 |---|---|---|
@@ -73,7 +101,7 @@ Os pinos padrão são estes:
 | Botão 3 | GPIO22 | pino 15 |
 | Outro fio de cada botão | GND | pinos 9, 14, 20, 25, 30, 34 ou 39 |
 
-Se os seus botões já estão soldados em outros pinos, descubra quais são:
+Para conferir se cada botão está funcionando, ou se ligou em outros pinos, rode:
 
 ```
 sudo systemctl stop video-botoes
@@ -136,7 +164,12 @@ faça as alterações e ative de novo.
 ## Iniciar por pendrive em vez do cartão (Raspberry Pi 3 Model B)
 
 A **Pi 3 Model B** consegue iniciar por pendrive, mas esse recurso vem desligado
-de fábrica e **só pode ser ligado usando um cartão SD uma vez**:
+de fábrica e **só pode ser ligado usando um cartão SD uma vez**.
+
+**Primeiro tente direto:** grave o sistema no pendrive (Passo 1), tire o cartão
+da Pi, coloque o pendrive e ligue. Espere até 1 minuto. Se o sistema iniciar,
+o recurso já estava ligado nessa placa e você não precisa fazer mais nada.
+Se ficar só a tela colorida ou a tela preta, faça o procedimento abaixo:
 
 1. Grave o Raspberry Pi OS Lite em um cartão (Passo 1) e inicie a Pi por ele.
 2. Digite:
