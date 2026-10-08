@@ -177,8 +177,33 @@ Por fim: `sudo systemctl restart video-botoes`
 | Testar o som do P2 | `speaker-test -D plughw:CARD=Headphones -c 2 -t wav` |
 | Ajustar o volume do P2 | `alsamixer -c Headphones` |
 
-Para trocar um vídeo: copie o novo arquivo para `~/videos` com o mesmo nome,
-ou mude o nome em `config.ini`, e reinicie o programa.
+## Trocar os vídeos pelo PC (sem tirar o cartão)
+
+A Raspberry precisa estar ligada e na mesma rede do PC.
+
+1. No PC, aperte **Windows + R**, digite `cmd` e Enter.
+2. Envie o vídeo novo (troque o caminho pelo do seu arquivo):
+
+   ```
+   scp "C:\caminho\do\arquivo\video1.mp4" pi@192.168.0.95:~/videos/video1.mp4
+   ```
+
+   Digite a senha da Raspberry quando pedir. O arquivo antigo é substituído.
+   Para o botão 2 ou 3, use `video2.mp4` ou `video3.mp4` no final do comando.
+3. Pronto: no próximo aperto do botão já toca o vídeo novo.
+
+Observações:
+
+- O IP `192.168.0.95` pode mudar se o roteador reiniciar. Se o comando não
+  conectar, tente `pi@ETBR.local` no lugar do IP.
+- Se o modo somente leitura (Passo 5) estiver ativado, desative antes de trocar
+  os vídeos. Senão a troca se perde ao reiniciar.
+
+## Saída de som
+
+Na placa desta instalação o conector P2 não funcionou, então o som foi
+configurado para sair pela TV (`saida = hdmi` em `config.ini`). Para usar um
+adaptador de som USB no futuro, é preciso ajustar `player.py`.
 
 ## Passo 5 (recomendado) — Proteger o cartão contra desligamentos bruscos
 
